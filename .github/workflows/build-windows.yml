@@ -39,7 +39,7 @@ jobs:
       #    !!! ESTE É O PASSO MAIS IMPORTANTE PARA VOCÊ EDITAR !!!
       - name: Gerar o .exe com GraalVM
         run: |
-          native-image -jar build/libs/test_executable-1.0-SNAPSHOT-all.jar meu-executavel.exe
+          native-image -jar build/libs/test_executable-1.0-SNAPSHOT-all.jar meu-executavel
         # -----------------------------------------------------------------
         # MUDE AS DUAS COISAS ACIMA:
         # 1. 'build/libs/meu-projeto-1.0-all.jar' -> Coloque o caminho EXATO do .jar que o Passo 1C criou.
