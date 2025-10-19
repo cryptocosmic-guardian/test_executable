@@ -1,0 +1,57 @@
+# Nome do workflow (vai aparecer no GitHub)
+name: Build Windows Executable
+
+# Define QUANDO isso deve rodar
+on:
+  # Opção 1: Rodar sempre que você der 'push' na branch 'main'
+  push:
+    branches: [ main ]
+
+  # Opção 2: Permite rodar manualmente (ÓTIMO para testar)
+  workflow_dispatch:
+
+# Define as TAREFAS
+jobs:
+  build-windows:
+    # 1. Diz ao GitHub para usar uma máquina virtual Windows
+    runs-on: windows-latest
+
+    steps:
+      # 2. Baixa o seu código-fonte para a máquina Windows
+      - name: Baixar o código (Checkout)
+        uses: actions/checkout@v4
+
+      # 3. Configura o Java e o GraalVM
+      #    (Baseado no seu histórico, você usa JDK 21)
+      - name: Configurar o GraalVM (JDK 21)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'graalvm'
+          java-version: '21'
+
+      # 4. Construir o "Fat JAR" (usando Gradle)
+      #    O 'run' executa um comando no terminal do Windows
+      - name: Construir o Fat JAR com Gradle
+        run: ./gradlew shadowJar
+        # Se você usar Maven, mude esta linha para: run: mvn package
+
+      # 5. Gerar o .exe com Native Image
+      #    !!! ESTE É O PASSO MAIS IMPORTANTE PARA VOCÊ EDITAR !!!
+      - name: Gerar o .exe com GraalVM
+        run: |
+          native-image -jar build/libs/test_executable-1.0-SNAPSHOT-all.jar meu-executavel.exe
+        # -----------------------------------------------------------------
+        # MUDE AS DUAS COISAS ACIMA:
+        # 1. 'build/libs/meu-projeto-1.0-all.jar' -> Coloque o caminho EXATO do .jar que o Passo 1C criou.
+        # 2. 'meu-executavel.exe'                 -> Escolha o nome que seu .exe final terá.
+        # -----------------------------------------------------------------
+
+      # 6. Publicar o .exe para você poder baixar
+      - name: Fazer upload do .exe
+        uses: actions/upload-artifact@v4
+        with:
+          # O nome do arquivo .zip que você vai baixar
+          name: windows-executavel
+
+          # O arquivo que deve ir para dentro do .zip
+          path: meu-executavel.exe # <-- Use o MESMO nome que você definiu no passo 5
